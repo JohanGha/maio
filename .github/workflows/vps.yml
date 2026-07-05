@@ -1,0 +1,28 @@
+name: Persistent VPS Terminal
+
+on:
+  workflow_dispatch: # این خط باعث می‌شه بتونی دستی ترمینال رو روشن کنی
+
+permissions:
+  contents: write # این دسترسی لازمه تا اکشن بتونه فایل‌ها رو آخر کار ذخیره کنه
+
+jobs:
+  vps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Start Interactive Terminal (tmate)
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true # برای امنیت بیشتر، فقط خودت بتونی وصل بشی
+
+      - name: Save State (Commit & Push)
+        if: always() # حتی اگر زمان تمام شد یا ترمینال رو بستی، حتماً ذخیره رو انجام بده
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Auto-save terminal state" || echo "No changes to save"
+          git push
