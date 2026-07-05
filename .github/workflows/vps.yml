@@ -1,46 +1,16 @@
-name: Persistent VPS Terminal (Official TTYD)
+name: Terminal Ubuntu Session
 
 on:
-  workflow_dispatch: # اجرای دستی
-
-permissions:
-  contents: write # دسترسی برای ذخیره فایل‌ها
+  workflow_dispatch:  # یعنی دستی از تب Actions اجراش می‌کنی
 
 jobs:
-  vps:
+  terminal:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Launch Web Terminal & Cloudflare Tunnel
-        run: |
-          echo "Downloading official unpatched ttyd binary..."
-          # دانلود نسخه اصلی و بدون پچ امنیتی لاگین
-          curl -L https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86_64 -o ttyd
-          chmod +x ttyd
-          
-          echo "Downloading Cloudflare Tunnel..."
-          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
-          chmod +x cloudflared
-          
-          echo "Starting Terminal Server..."
-          # اجرای نسخه اصلی در پس‌زمینه
-          nohup ./ttyd -p 7681 bash >/dev/null 2>&1 &
-          
-          sleep 5
-          
-          echo "Starting Cloudflare Tunnel..."
-          echo "------------------------------------------------------------"
-          echo "↓↓↓ دنبال لینکی بگرد که آخرش trycloudflare.com هست ↓↓↓"
-          echo "------------------------------------------------------------"
-          ./cloudflared tunnel --url http://localhost:7681
-
-      - name: Save State (Commit & Push)
-        if: always() # ذخیره فایل‌ها در هر شرایطی
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Auto-save terminal state" || echo "No changes to save"
-          git push
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true  # فقط خودت دسترسی داری، امن‌تره
