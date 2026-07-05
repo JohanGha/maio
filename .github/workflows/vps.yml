@@ -1,7 +1,7 @@
-name: Persistent VPS Terminal
+name: Persistent VPS Terminal (Cloudflare)
 
 on:
-  workflow_dispatch: # اجرای دستی ترمینال
+  workflow_dispatch: # اجرای دستی
 
 permissions:
   contents: write # دسترسی برای ذخیره فایل‌ها
@@ -13,13 +13,29 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Start Interactive Terminal (tmate)
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: false # این خط تغییر کرد تا نیاز به کلید SSH نباشه
+      - name: Launch Web Terminal & Cloudflare Tunnel
+        run: |
+          echo "Installing ttyd..."
+          sudo apt-get update && sudo apt-get install -y ttyd
+          
+          echo "Downloading Cloudflare Tunnel..."
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+          
+          echo "Starting Terminal Server..."
+          # اجرای ترمینال در پس‌زمینه
+          ttyd -p 7681 bash &
+          
+          sleep 3
+          
+          echo "Starting Cloudflare Tunnel..."
+          echo "------------------------------------------------------------"
+          echo "↓↓↓ دنبال لینکی بگرد که آخرش trycloudflare.com هست ↓↓↓"
+          echo "------------------------------------------------------------"
+          ./cloudflared tunnel --url http://localhost:7681
 
       - name: Save State (Commit & Push)
-        if: always() # حتی اگه زمان تموم شد، فایل‌ها رو ذخیره کن
+        if: always() # حتی اگر صفحه رو بستی یا زمان تموم شد، فایل‌ها رو ذخیره کن
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
