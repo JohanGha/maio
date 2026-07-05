@@ -1,4 +1,4 @@
-name: Persistent VPS Terminal (Cloudflare Fixed)
+name: Persistent VPS Terminal (Official TTYD)
 
 on:
   workflow_dispatch: # اجرای دستی
@@ -15,16 +15,18 @@ jobs:
 
       - name: Launch Web Terminal & Cloudflare Tunnel
         run: |
-          echo "Installing ttyd..."
-          sudo apt-get update && sudo apt-get install -y ttyd
+          echo "Downloading official unpatched ttyd binary..."
+          # دانلود نسخه اصلی و بدون پچ امنیتی لاگین
+          curl -L https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86_64 -o ttyd
+          chmod +x ttyd
           
           echo "Downloading Cloudflare Tunnel..."
           curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
           chmod +x cloudflared
           
           echo "Starting Terminal Server..."
-          # استفاده از nohup و دایرکت کردن خروجی‌ها برای جلوگیری از قفل شدن ترمینال
-          nohup ttyd -p 7681 bash >/dev/null 2>&1 &
+          # اجرای نسخه اصلی در پس‌زمینه
+          nohup ./ttyd -p 7681 bash >/dev/null 2>&1 &
           
           sleep 5
           
