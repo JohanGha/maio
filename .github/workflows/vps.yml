@@ -1,10 +1,10 @@
 name: Persistent VPS Terminal
 
 on:
-  workflow_dispatch: # این خط باعث می‌شه بتونی دستی ترمینال رو روشن کنی
+  workflow_dispatch: # اجرای دستی ترمینال
 
 permissions:
-  contents: write # این دسترسی لازمه تا اکشن بتونه فایل‌ها رو آخر کار ذخیره کنه
+  contents: write # دسترسی برای ذخیره فایل‌ها
 
 jobs:
   vps:
@@ -16,10 +16,10 @@ jobs:
       - name: Start Interactive Terminal (tmate)
         uses: mxschmitt/action-tmate@v3
         with:
-          limit-access-to-actor: true # برای امنیت بیشتر، فقط خودت بتونی وصل بشی
+          limit-access-to-actor: false # این خط تغییر کرد تا نیاز به کلید SSH نباشه
 
       - name: Save State (Commit & Push)
-        if: always() # حتی اگر زمان تمام شد یا ترمینال رو بستی، حتماً ذخیره رو انجام بده
+        if: always() # حتی اگه زمان تموم شد، فایل‌ها رو ذخیره کن
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
