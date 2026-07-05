@@ -22,9 +22,9 @@ jobs:
           curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
           chmod +x cloudflared
           
-          echo "Starting Terminal Server..."
-          # اجرای ترمینال در پس‌زمینه
-          ttyd -p 7681 bash &
+          echo "Starting Terminal Server on Port 8080..."
+          # تغییر پورت به 8080 و اجرای مستقیم باش بدون لاگین
+          ttyd -p 8080 /bin/bash &
           
           sleep 3
           
@@ -32,10 +32,10 @@ jobs:
           echo "------------------------------------------------------------"
           echo "↓↓↓ دنبال لینکی بگرد که آخرش trycloudflare.com هست ↓↓↓"
           echo "------------------------------------------------------------"
-          ./cloudflared tunnel --url http://localhost:7681
+          ./cloudflared tunnel --url http://localhost:8080
 
       - name: Save State (Commit & Push)
-        if: always() # حتی اگر صفحه رو بستی یا زمان تموم شد، فایل‌ها رو ذخیره کن
+        if: always()
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
