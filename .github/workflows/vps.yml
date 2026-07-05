@@ -1,4 +1,4 @@
-name: Persistent VPS Terminal (Cloudflare)
+name: Persistent VPS Terminal (Cloudflare Fixed)
 
 on:
   workflow_dispatch: # اجرای دستی
@@ -22,20 +22,20 @@ jobs:
           curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
           chmod +x cloudflared
           
-          echo "Starting Terminal Server on Port 8080..."
-          # تغییر پورت به 8080 و اجرای مستقیم باش بدون لاگین
-          ttyd -p 8080 /bin/bash &
+          echo "Starting Terminal Server..."
+          # استفاده از nohup و دایرکت کردن خروجی‌ها برای جلوگیری از قفل شدن ترمینال
+          nohup ttyd -p 7681 bash >/dev/null 2>&1 &
           
-          sleep 3
+          sleep 5
           
           echo "Starting Cloudflare Tunnel..."
           echo "------------------------------------------------------------"
           echo "↓↓↓ دنبال لینکی بگرد که آخرش trycloudflare.com هست ↓↓↓"
           echo "------------------------------------------------------------"
-          ./cloudflared tunnel --url http://localhost:8080
+          ./cloudflared tunnel --url http://localhost:7681
 
       - name: Save State (Commit & Push)
-        if: always()
+        if: always() # ذخیره فایل‌ها در هر شرایطی
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
